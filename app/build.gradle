@@ -13,6 +13,8 @@ android {
 
         ndk {
             moduleName "hello_jni"
+            //abiFilters "armeabi"    //filter the abi, just build the aremabi
+            ldLibs("log")               //config the log for c or cpp
         }
 
     }

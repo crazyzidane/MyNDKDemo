@@ -2,6 +2,10 @@
 #include <com_example_liushanpu_myndkdemo_Hello.h>
 /* Header for class com_example_liushanpu_myndkdemo_Hello */
 
+#include <android/log.h>
+#define LOG_TAG "liusp_myndkdemo"
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__))
+
 /*
  * Class:     com_example_liushanpu_myndkdemo_Hello
  * Method:    sayHello
@@ -9,5 +13,44 @@
  */
 JNIEXPORT jstring JNICALL Java_com_example_liushanpu_myndkdemo_Hello_sayHello
   (JNIEnv *env, jclass jclass) {
+    LOGI("this is log which is from cpp");
     return env->NewStringUTF("hello from cpp");
   }
+
+
+JNIEXPORT void JNICALL Java_com_example_liushanpu_myndkdemo_Hello_callStaticMethod__I
+        (JNIEnv *env, jclass jclass, jint jint) {
+
+    // 1、 find the corresponding java class
+    _jclass * cls_hello = env->FindClass("com/example/liushanpu/myndkdemo/Hello");
+    if (cls_hello == NULL) {
+        return;
+    }
+
+    // 2、 find the corresponding method
+    jmethodID mth_static_method = env->GetStaticMethodID(cls_hello, "staticMethod", "(Ljava/lang/String;)V");
+    if (mth_static_method == NULL) {
+        return;
+    }
+
+    // find the corresponding field
+    jfieldID fld_name = env->GetStaticFieldID(cls_hello, "mName", "Ljava/lang/String;");
+    if (fld_name == NULL) {
+        return;
+    }
+    jstring new_name = env->NewStringUTF("xiaoyu");
+    // modify the static field in java
+    env->SetStaticObjectField(cls_hello, fld_name, new_name);
+
+    jstring data = env->NewStringUTF("call java method from native method in cpp");
+    if (data == NULL) {
+        return;
+    }
+    // 3、invoke the method which is in java.
+    env->CallStaticVoidMethod(cls_hello, mth_static_method, data);
+
+    // 4、 delete the reference
+    env->DeleteLocalRef(cls_hello);
+    env->DeleteLocalRef(data );
+    env->DeleteLocalRef(new_name);
+}

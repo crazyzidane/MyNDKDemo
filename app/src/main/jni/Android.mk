@@ -9,5 +9,8 @@ LOCAL_MODULE    :=  hello_jni
 
 LOCAL_SRC_FILES :=  com_example_liushanpu_myndkdemo_Hello.cpp
 
+# config the log for c or cpp
+LOCAL_LDLIBS    :=  -llog
+
 #指定生成的静态库或者共享库在运行时依赖的共享库模块列表
 include $(BUILD_SHARED_LIBRARY)

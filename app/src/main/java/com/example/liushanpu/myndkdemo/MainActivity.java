@@ -14,6 +14,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         tv1 = (TextView) findViewById(R.id.text1);
 
+        Hello.callStaticMethod(111);
+
         //Because the sayHello is static method, it is did not initial for Hello class.
         tv1.setText(Hello.sayHello());
     }
