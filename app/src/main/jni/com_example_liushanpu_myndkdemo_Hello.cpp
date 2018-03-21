@@ -17,7 +17,7 @@ JNIEXPORT jstring JNICALL Java_com_example_liushanpu_myndkdemo_Hello_sayHello
     return env->NewStringUTF("hello from cpp");
   }
 
-
+//this method will call static method in java.
 JNIEXPORT void JNICALL Java_com_example_liushanpu_myndkdemo_Hello_callStaticMethod__I
         (JNIEnv *env, jclass jclass, jint jint) {
 
@@ -33,24 +33,79 @@ JNIEXPORT void JNICALL Java_com_example_liushanpu_myndkdemo_Hello_callStaticMeth
         return;
     }
 
-    // find the corresponding field
+    // 3、 find the corresponding field
     jfieldID fld_name = env->GetStaticFieldID(cls_hello, "mName", "Ljava/lang/String;");
     if (fld_name == NULL) {
         return;
     }
     jstring new_name = env->NewStringUTF("xiaoyu");
-    // modify the static field in java
+    // 4、modify the static field in java
     env->SetStaticObjectField(cls_hello, fld_name, new_name);
 
     jstring data = env->NewStringUTF("call java method from native method in cpp");
     if (data == NULL) {
         return;
     }
-    // 3、invoke the method which is in java.
+    // 5、invoke the method which is in java.
     env->CallStaticVoidMethod(cls_hello, mth_static_method, data);
 
-    // 4、 delete the reference
+    // 6、 delete the reference
     env->DeleteLocalRef(cls_hello);
     env->DeleteLocalRef(data );
     env->DeleteLocalRef(new_name);
+}
+
+
+//This method will call non static method in java.
+JNIEXPORT void JNICALL Java_com_example_liushanpu_myndkdemo_Hello_callInstanceMethod__I
+        (JNIEnv *env, jobject jobject1, jint jint1) {
+    // 1、find the corresponding java class
+    _jclass * cls_hello = env->FindClass("com/example/liushanpu/myndkdemo/Hello");
+    if (cls_hello == NULL) {
+        return;
+    }
+
+    // 2、find the corresponding java method which will be called.
+    jmethodID mth_method = env->GetMethodID(cls_hello, "method", "(Ljava/lang/String;)V");
+    if (mth_method == NULL) {
+        return;
+    }
+
+    // 3、find the construct method of the java class
+    jmethodID mtd_construct = env->GetMethodID(cls_hello, "<init>", "()V");
+    if (mtd_construct == NULL) {
+        return;
+    }
+
+    // 4、create the java class object
+    jobject hello = env->NewObject(cls_hello, mtd_construct, NULL);
+    if (hello == NULL) {
+        return;
+    }
+    jstring message = env->NewStringUTF("call non static method in java from cpp");
+    //env->CallVoidMethod(hello, mth_method, "");
+    // 这样会导致JNI ERROR (app bug): accessed stale Global 0x7904f1241e  (index -1873866175 in a table of size 491)，
+    // JNI DETECTED ERROR IN APPLICATION: use of deleted global reference 0x7904f1241e from void com.example.liushanpu.myndkdemo.Hello.callInstanceMethod(int)
+    // Fatal signal 6 (SIGABRT), code -6 in tid 22627 (hanpu.myndkdemo), pid 22627 (hanpu.myndkdemo)
+
+
+    jfieldID fld_address = env->GetFieldID(cls_hello, "mAddress", "Ljava/lang/String;");
+    if (fld_address == NULL) {
+        return;
+    }
+    jstring address = env->NewStringUTF("ChongQing");
+    if (address == NULL) {
+        return;
+    }
+    // 5、modify the non static field in java class.
+    env->SetObjectField(hello, fld_address, address);
+
+    // 6、 invoke the non static method in java
+    env->CallVoidMethod(hello, mth_method, message);
+
+    // 7、delete the reference
+    env->DeleteLocalRef(cls_hello);
+    env->DeleteLocalRef(hello);
+    env->DeleteLocalRef(message);
+    env->DeleteLocalRef(address);
 }

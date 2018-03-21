@@ -13,16 +13,26 @@ public class Hello {
         System.loadLibrary("hello_jni");
     }
 
+    //static var
     private static String mName = "liusp";
+
+    //non static var
+    private String mAddress = "ChengDu";
 
     public static void logMessage(String str) {
         Log.d("liusp", str);
     }
 
-    //this method will be called by native method.
+    //this static method will be called by native method.
     public static void staticMethod(String data) {
         logMessage(data);
         logMessage(mName);
+    }
+
+    //the non static method.
+    public void method(String data) {
+        logMessage(data);
+        logMessage(mAddress);
     }
 
     //the static native method

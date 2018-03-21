@@ -26,7 +26,9 @@
 	cd app/src/main/java javah -encoding UTF-8 -d ../jni com.lqm.ndkjnistudy.Hello 
 	//-d:生成目录 .. ：当前文件的上层文件夹
 
-
+## 4、About call non static method in java from cpp
+	2018/03/21
+	Find java class -> call construct method -> create class object -> invoke corresponding non static method
 
 
 	the command to git push the code:
