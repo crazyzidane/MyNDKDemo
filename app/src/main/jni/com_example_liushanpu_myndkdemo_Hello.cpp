@@ -30,12 +30,14 @@ JNIEXPORT void JNICALL Java_com_example_liushanpu_myndkdemo_Hello_callStaticMeth
     // 2、 find the corresponding method
     jmethodID mth_static_method = env->GetStaticMethodID(cls_hello, "staticMethod", "(Ljava/lang/String;)V");
     if (mth_static_method == NULL) {
+        env->DeleteLocalRef(cls_hello);
         return;
     }
 
     // 3、 find the corresponding field
     jfieldID fld_name = env->GetStaticFieldID(cls_hello, "mName", "Ljava/lang/String;");
     if (fld_name == NULL) {
+        env->DeleteLocalRef(cls_hello);
         return;
     }
     jstring new_name = env->NewStringUTF("xiaoyu");
@@ -44,6 +46,8 @@ JNIEXPORT void JNICALL Java_com_example_liushanpu_myndkdemo_Hello_callStaticMeth
 
     jstring data = env->NewStringUTF("call java method from native method in cpp");
     if (data == NULL) {
+        env->DeleteLocalRef(cls_hello);
+        env->DeleteLocalRef(new_name);
         return;
     }
     // 5、invoke the method which is in java.
@@ -68,18 +72,21 @@ JNIEXPORT void JNICALL Java_com_example_liushanpu_myndkdemo_Hello_callInstanceMe
     // 2、find the corresponding java method which will be called.
     jmethodID mth_method = env->GetMethodID(cls_hello, "method", "(Ljava/lang/String;)V");
     if (mth_method == NULL) {
+        env->DeleteLocalRef(cls_hello);
         return;
     }
 
     // 3、find the construct method of the java class
     jmethodID mtd_construct = env->GetMethodID(cls_hello, "<init>", "()V");
     if (mtd_construct == NULL) {
+        env->DeleteLocalRef(cls_hello);
         return;
     }
 
     // 4、create the java class object
     jobject hello = env->NewObject(cls_hello, mtd_construct, NULL);
     if (hello == NULL) {
+        env->DeleteLocalRef(cls_hello);
         return;
     }
     jstring message = env->NewStringUTF("call non static method in java from cpp");
@@ -91,10 +98,16 @@ JNIEXPORT void JNICALL Java_com_example_liushanpu_myndkdemo_Hello_callInstanceMe
 
     jfieldID fld_address = env->GetFieldID(cls_hello, "mAddress", "Ljava/lang/String;");
     if (fld_address == NULL) {
+        env->DeleteLocalRef(cls_hello);
+        env->DeleteLocalRef(hello);
+        env->DeleteLocalRef(message);
         return;
     }
     jstring address = env->NewStringUTF("ChongQing");
     if (address == NULL) {
+        env->DeleteLocalRef(cls_hello);
+        env->DeleteLocalRef(hello);
+        env->DeleteLocalRef(message);
         return;
     }
     // 5、modify the non static field in java class.
